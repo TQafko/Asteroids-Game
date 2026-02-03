@@ -7,12 +7,12 @@ from player import Player
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from shot import Shot
+from gamestats import GameStats
 
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.font.init()
-    font = pygame.font.Font(None, 100)
+
     print("Starting Asteroids with pygame version: VERSION")
     print("Screen width:", SCREEN_WIDTH)
     print("Screen height:", SCREEN_HEIGHT)
@@ -26,15 +26,19 @@ def main():
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
+    gamestats = pygame.sprite.Group()
 
 
     Player.containers = (updatable, drawable)
     Asteroid.containers = (asteroids, updatable, drawable)
     AsteroidField.containers = (updatable)
     Shot.containers = (shots, drawable, updatable)
+    GameStats.containers = (gamestats, drawable)
 
     player = Player(x, y)
     asteroid_field = AsteroidField()
+    gamestats = GameStats()
+    
     while(1):
         log_state()
         for event in pygame.event.get():
@@ -44,17 +48,18 @@ def main():
         screen.fill("black")
 
         updatable.update(dt)
-        # Inside the game loop
-        score_text = font.render(f"Score: {score}", True, (255, 255, 255)) # White color
-        screen.blit(score_text, (10, 10)) # Top-left corner
+        gamestats.update(score, player.life, dt)
 
         for asteroid_i in asteroids:
             if asteroid_i.collides_with(player):
                 log_event("player_hit")
-                print("Game Over!")
                 player.position.x = x
                 player.position.y = y
-                score = 0
+                dead = player.hit()
+                if dead == 1:
+                    player.kill()
+                    print("Game Over!")
+                    sys.exit()
         
         for asteroid_i in asteroids:
             for shot_i in shots:

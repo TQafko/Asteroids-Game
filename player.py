@@ -9,6 +9,7 @@ class Player(CircleShape):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.shot_cooldown = 0
+        self.life = PLAYER_LIFE
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -37,7 +38,13 @@ class Player(CircleShape):
             self.position.x = SCREEN_WIDTH
         if self.position.x < 0:
             self.position.x = 0
-        
+    
+    def hit(self):
+        self.life -= 1
+        if self.life <= 0:
+            self.kill()
+            return 1
+            
 
     def shoot(self):
         if self.shot_cooldown > 0:
