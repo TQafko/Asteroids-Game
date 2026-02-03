@@ -16,6 +16,19 @@ print("Starting Asteroids with pygame version: VERSION")
 print("Screen width:", SCREEN_WIDTH)
 print("Screen height:", SCREEN_HEIGHT)
 
+updatable = pygame.sprite.Group()
+drawable = pygame.sprite.Group()
+asteroids = pygame.sprite.Group()
+shots = pygame.sprite.Group()
+gamestats = pygame.sprite.Group()
+
+Player.containers = (updatable, drawable)
+Asteroid.containers = (asteroids, updatable, drawable)
+AsteroidField.containers = (updatable)
+Shot.containers = (shots, drawable, updatable)
+GameStats.containers = (gamestats, drawable)
+
+gamestats = GameStats()
 current_scene = "main_menu"
 
 def draw_text(text, font, color, surface, x, y):
@@ -42,6 +55,9 @@ def main_menu():
         font = pygame.font.Font(None, 74)
         draw_text('Main Menu', font, "white", screen, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 4)
         
+        score, _, _ = gamestats.get_stats()
+        draw_text(f'Score: {score}', font, "white",screen, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2.5)
+
         play_button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2, 200, 50)
         pygame.draw.rect(screen, "white", play_button_rect)
         draw_text('Play', pygame.font.Font(None, 40), "black", screen, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 25)
@@ -60,22 +76,8 @@ def game_loop():
     y = SCREEN_HEIGHT / 2
     score = 0
 
-    updatable = pygame.sprite.Group()
-    drawable = pygame.sprite.Group()
-    asteroids = pygame.sprite.Group()
-    shots = pygame.sprite.Group()
-    gamestats = pygame.sprite.Group()
-
-
-    Player.containers = (updatable, drawable)
-    Asteroid.containers = (asteroids, updatable, drawable)
-    AsteroidField.containers = (updatable)
-    Shot.containers = (shots, drawable, updatable)
-    GameStats.containers = (gamestats, drawable)
-
     player = Player(x, y)
     asteroid_field = AsteroidField()
-    gamestats = GameStats()
 
     while current_scene == "game":
         screen.fill("black")
@@ -99,6 +101,8 @@ def game_loop():
                 gamestats.update(score, player.life, dt)
                 if dead == 1:
                     player.kill()
+                    for asteroid_i in asteroids:
+                        asteroid_i.kill()
                     print("Game Over!")
                     print("(Score, Life, Time Elapsed)",gamestats.get_stats())
                     current_scene = "main_menu"
