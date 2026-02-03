@@ -17,9 +17,9 @@ As per [boot.dev](https://www.boot.dev/lessons/5be3e3bd-efb5-4664-a9e9-7111be783
 
 2. Run these commands:
     ```bash
-    uv venv
+    uv venv --python 3.12
     source .venv/bin/activate
-    uv add pygame==2.6.1
+    uv pip install pygame
     ```
 
 3. Run the game:
