@@ -56,9 +56,11 @@ def main():
                 player.position.x = x
                 player.position.y = y
                 dead = player.hit()
+                gamestats.update(score, player.life, dt)
                 if dead == 1:
                     player.kill()
                     print("Game Over!")
+                    print("(Score, Life, Time Elapsed)",gamestats.get_stats())
                     sys.exit()
         
         for asteroid_i in asteroids:
